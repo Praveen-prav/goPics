@@ -50,51 +50,61 @@ class _CamScreenState extends State<CamScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    var height = size.height;
+    var width = size.width;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Take Picture"),
       ),
       body: Column(
         children: [
-          FutureBuilder<void>(
-            future: initconFut,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                // If the Future is complete, display the preview.
-                return CameraPreview(controller);
-              } else {
-                // Otherwise, display a loading indicator.
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
+          Container(
+            height: height - 200,
+            child: FutureBuilder<void>(
+              future: initconFut,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  // If the Future is complete, display the preview.
+                  return CameraPreview(controller);
+                } else {
+                  // Otherwise, display a loading indicator.
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
           ),
           const SizedBox(height: 16),
           Container(
+            height: 90,
+            width: 90,
             decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 251, 64, 232),
+                color: Color.fromARGB(255, 245, 66, 221),
                 borderRadius: BorderRadius.all(Radius.circular(20))),
             //
             child: IconButton(
-                color: Colors.black,
-                onPressed: () async {
-                  try {
-                    await initconFut;
-                    final image = await controller.takePicture();
-                    if (!mounted) return;
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => DisplayPictureScreen(
-                          imagePath: image.path,
-                        ),
+              color: Colors.black,
+              onPressed: () async {
+                try {
+                  await initconFut;
+                  final image = await controller.takePicture();
+                  if (!mounted) return;
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DisplayPictureScreen(
+                        imagePath: image.path,
                       ),
-                    );
-                  } catch (e) {
-                    if (kDebugMode) {
-                      print(e);
-                    }
+                    ),
+                  );
+                } catch (e) {
+                  if (kDebugMode) {
+                    print(e);
                   }
-                },
-                icon: const Icon(Icons.camera_alt)),
+                }
+              },
+              icon: const Icon(Icons.camera_alt),
+              iconSize: 60,
+            ),
           )
         ],
       ),
@@ -113,7 +123,9 @@ class DisplayPictureScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Display the Picture')),
       body: Column(
         children: [
-          Image.file(File(imagePath)),
+          Container(
+              margin: EdgeInsets.only(top: 20),
+              child: Image.file(File(imagePath))),
           const SizedBox(
             height: 16,
           ),
@@ -131,17 +143,18 @@ class DisplayPictureScreen extends StatelessWidget {
             textAlign: TextAlign.left,
           ),
           const SizedBox(
-            height: 16,
+            height: 35,
           ),
           Container(
             decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.elliptical(20, 10)),
                 gradient: LinearGradient(
-              colors: <Color>[
-                Color.fromARGB(255, 131, 13, 161),
-                Color.fromARGB(255, 210, 25, 207),
-                Color.fromARGB(255, 245, 66, 221),
-              ],
-            )),
+                  colors: <Color>[
+                    Color.fromARGB(255, 131, 13, 161),
+                    Color.fromARGB(255, 210, 25, 207),
+                    Color.fromARGB(255, 245, 66, 221),
+                  ],
+                )),
             child: TextButton(
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
@@ -160,8 +173,13 @@ class DisplayPictureScreen extends StatelessWidget {
                     "name": filename,
                     "timecreated": DateTime.now().toString()
                   };
-                  refImg.putFile(File(imagePath),
+                  final task = refImg.putFile(File(imagePath),
                       SettableMetadata(customMetadata: custommetadata));
+                  task.whenComplete(() => {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                const MyHomePage(title: "goPics")))
+                      });
                 },
                 child: const Text("Upload")),
           ),
@@ -179,13 +197,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'goPics',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
             seedColor: const Color.fromARGB(255, 152, 58, 183)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'goPics'),
     );
   }
 }
