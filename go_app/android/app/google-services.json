@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "240095002638",
+    "project_id": "store-media-9b9bd",
+    "storage_bucket": "store-media-9b9bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:240095002638:android:54a227ffc5b9d038317c5f",
+        "android_client_info": {
+          "package_name": "com.example.camera_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "240095002638-icggbr1carq1rfjeoct6jn9h7recegn6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-r_8GT48UVda6p7-Rp9vyFiEs8nsnX4M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "240095002638-icggbr1carq1rfjeoct6jn9h7recegn6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:240095002638:android:9015ab6cea8b9050317c5f",
+        "android_client_info": {
+          "package_name": "com.example.go_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "240095002638-icggbr1carq1rfjeoct6jn9h7recegn6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-r_8GT48UVda6p7-Rp9vyFiEs8nsnX4M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "240095002638-icggbr1carq1rfjeoct6jn9h7recegn6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

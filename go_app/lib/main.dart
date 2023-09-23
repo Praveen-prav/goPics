@@ -3,9 +3,16 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import "package:camera/camera.dart";
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 late String nameOwner, iD;
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -142,9 +149,19 @@ class DisplayPictureScreen extends StatelessWidget {
                   textStyle: const TextStyle(fontSize: 20),
                 ),
                 onPressed: () {
-                  if (kDebugMode) {
-                    print("upoload complete");
-                  }
+                  String filename =
+                      "${nameOwner}_${iD}_${DateTime.now().millisecondsSinceEpoch}";
+                  Reference referenceRoot = FirebaseStorage.instance.ref();
+                  Reference refDir = referenceRoot.child('images');
+                  Reference refImg = refDir.child(filename);
+                  Map<String, String> custommetadata = {
+                    "Owner": nameOwner,
+                    "Animal ID": iD,
+                    "name": filename,
+                    "timecreated": DateTime.now().toString()
+                  };
+                  refImg.putFile(File(imagePath),
+                      SettableMetadata(customMetadata: custommetadata));
                 },
                 child: const Text("Upload")),
           ),
@@ -252,7 +269,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> navigate(BuildContext context) async {
-    WidgetsFlutterBinding.ensureInitialized();
     final cameras = await availableCameras();
     final firstCam = cameras.first;
     if (!mounted) return;
