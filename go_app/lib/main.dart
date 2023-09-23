@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 late String nameOwner, iD;
+late bool uploaded;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -50,37 +51,37 @@ class _CamScreenState extends State<CamScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    var height = size.height;
-    var width = size.width;
+    // final size = MediaQuery.of(context).size;
+    // var height = size.height;
+    // var width = size.width;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Take Picture"),
       ),
       body: Column(
         children: [
-          Container(
-            height: height - 200,
-            child: FutureBuilder<void>(
-              future: initconFut,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  // If the Future is complete, display the preview.
-                  return CameraPreview(controller);
-                } else {
-                  // Otherwise, display a loading indicator.
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
+          const SizedBox(
+            height: 40,
           ),
-          const SizedBox(height: 16),
+          FutureBuilder<void>(
+            future: initconFut,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                // If the Future is complete, display the preview.
+                return CameraPreview(controller);
+              } else {
+                // Otherwise, display a loading indicator.
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+          const SizedBox(height: 35),
           Container(
             height: 90,
             width: 90,
             decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 245, 66, 221),
-                borderRadius: BorderRadius.all(Radius.circular(20))),
+                color: Color.fromARGB(126, 158, 158, 158),
+                borderRadius: BorderRadius.all(Radius.circular(30))),
             //
             child: IconButton(
               color: Colors.black,
@@ -112,11 +113,16 @@ class _CamScreenState extends State<CamScreen> {
   }
 }
 
-class DisplayPictureScreen extends StatelessWidget {
+class DisplayPictureScreen extends StatefulWidget {
   final String imagePath;
 
   const DisplayPictureScreen({super.key, required this.imagePath});
 
+  @override
+  State<DisplayPictureScreen> createState() => _DisplayPictureScreenState();
+}
+
+class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,8 +130,8 @@ class DisplayPictureScreen extends StatelessWidget {
       body: Column(
         children: [
           Container(
-              margin: EdgeInsets.only(top: 20),
-              child: Image.file(File(imagePath))),
+              margin: const EdgeInsets.only(top: 20),
+              child: Image.file(File(widget.imagePath))),
           const SizedBox(
             height: 16,
           ),
@@ -147,14 +153,14 @@ class DisplayPictureScreen extends StatelessWidget {
           ),
           Container(
             decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.elliptical(20, 10)),
+                // borderRadius: BorderRadius.all(Radius.elliptical(20, 10)),
                 gradient: LinearGradient(
-                  colors: <Color>[
-                    Color.fromARGB(255, 131, 13, 161),
-                    Color.fromARGB(255, 210, 25, 207),
-                    Color.fromARGB(255, 245, 66, 221),
-                  ],
-                )),
+              colors: <Color>[
+                Color.fromARGB(255, 131, 13, 161),
+                Color.fromARGB(255, 210, 25, 207),
+                Color.fromARGB(255, 245, 66, 221),
+              ],
+            )),
             child: TextButton(
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
@@ -173,13 +179,17 @@ class DisplayPictureScreen extends StatelessWidget {
                     "name": filename,
                     "timecreated": DateTime.now().toString()
                   };
-                  final task = refImg.putFile(File(imagePath),
+                  final task = refImg.putFile(File(widget.imagePath),
                       SettableMetadata(customMetadata: custommetadata));
                   task.whenComplete(() => {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) =>
                                 const MyHomePage(title: "goPics")))
                       });
+                  const snackBar = SnackBar(
+                    content: Text('Uploaded!'),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 },
                 child: const Text("Upload")),
           ),
@@ -217,6 +227,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final myController = TextEditingController();
+  late bool nameO, id;
 
   @override
   void dispose() {
@@ -237,11 +248,23 @@ class _MyHomePageState extends State<MyHomePage> {
                 width: 300,
                 child: Column(
                   children: [
-                    TextField(
+                    TextFormField(
                       decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: "Name of the Owner"),
+                        border: OutlineInputBorder(),
+                        labelText: "Name of the Owner",
+                      ),
+                      validator: (name) {
+                        if (name!.isEmpty) {
+                          const Dialog(
+                            child: Text("Name Empty"),
+                          );
+                        }
+                        return null;
+                      },
                       onChanged: (name) {
+                        setState(() {
+                          nameO = true;
+                        });
                         nameOwner = name;
                         if (kDebugMode) {
                           print(nameOwner);
@@ -249,13 +272,24 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    TextField(
+                    TextFormField(
                       controller: myController,
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: "Unique ID of animal"),
+                      validator: (id) {
+                        if (id!.isEmpty) {
+                          const Dialog(
+                            child: Text("ID Empty"),
+                          );
+                        }
+                        return null;
+                      },
                       onChanged: (text) {
                         iD = text;
+                        setState(() {
+                          id = true;
+                        });
                         if (kDebugMode) {
                           print(iD);
                         }
@@ -278,7 +312,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             textStyle: const TextStyle(fontSize: 20),
                           ),
                           onPressed: () async {
-                            await navigate(context);
+                            if (nameO == true && id == true) {
+                              await navigate(context);
+                            }
                           },
                           child: const Text("Capture images")),
                     ),
